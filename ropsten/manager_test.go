@@ -21,7 +21,6 @@ import (
 	"github.com/astaxie/beego/config"
 	"github.com/blocktree/openwallet/v2/common"
 	"github.com/blocktree/openwallet/v2/log"
-	"github.com/blocktree/quorum-adapter/quorum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/core/types"
 	"math/big"
@@ -85,18 +84,20 @@ func TestWalletManager_SetNetworkChainID(t *testing.T) {
 func TestWalletManager_GetTransactionFeeEstimated(t *testing.T) {
 	wm := testNewWalletManager()
 
-	data, createErr := wm.EncodeABIParam(quorum.ERC20_ABI, "transfer", "0x427003e98c9beecb415b94f583e3225d9fd14ba1", "720500721")
-	if createErr != nil {
-		t.Errorf("EncodeABIParam error: %v", createErr)
-		return
-	}
+	//data, createErr := wm.EncodeABIParam(quorum.ERC20_ABI, "transfer", "0x427003e98c9beecb415b94f583e3225d9fd14ba1", "720500721")
+	//if createErr != nil {
+	//	t.Errorf("EncodeABIParam error: %v", createErr)
+	//	return
+	//}
+
+	data, _ := hex.DecodeString("7ff36ab50000000000000000000000000000000000000000000000019cfa75e9bf8bfdbb00000000000000000000000000000000000000000000000000000000000000800000000000000000000000008c178b782fab1d0686d88bc16b31f80431098fa1000000000000000000000000000000000000000000000000000000005f4b1c200000000000000000000000000000000000000000000000000000000000000002000000000000000000000000c778417e063141139fce010982780140aa0cd5ab000000000000000000000000eb4debf40ad9f526c9469c9a4bcb734393183d5e")
 
 	log.Infof("data: %s", hex.EncodeToString(data))
-
+	value := common.StringNumToBigIntWithExp("0.0001", wm.Decimal())
 	txFee, err := wm.GetTransactionFeeEstimated(
-		"0xc36eef576210a7850d73de2d7a1523123ba0cfdb",
-		"0xdac17f958d2ee523a2206206994597c13d831ec7",
-		nil,
+		"0x8c178b782fab1d0686d88bc16b31f80431098fa1",
+		"0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+		value,
 		data)
 	if err != nil {
 		t.Errorf("GetTransactionFeeEstimated error: %v", err)
