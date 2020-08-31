@@ -16,9 +16,12 @@
 package openwtester
 
 import (
+	"encoding/json"
+	"github.com/blocktree/openwallet/v2/common"
 	"github.com/blocktree/openwallet/v2/log"
 	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/blocktree/quorum-adapter/quorum"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"testing"
 )
 
@@ -47,7 +50,7 @@ func TestCallSmartContractABI(t *testing.T) {
 	//0x19a4b5d6ea319a5d5ad1d4cc00a5e2e28cac5ec3
 }
 
-func TestSmartContractTransaction(t *testing.T) {
+func TestSmartContractTransaction_ABI(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WJyrmJL67qb6LsxtkaEkBrZoVtg83Ecj1y"
 	accountID := "Ff7w6KZZ9UWuVgVwVkvA9aegGxVTdKNr5jC2LDv142gs"
@@ -78,7 +81,7 @@ func TestSmartContractTransaction(t *testing.T) {
 		"1598757982",
 	}
 
-	rawTx, err := tm.CreateSmartContractTransaction(testApp, walletID, accountID, "0.0002", "", &contract, callParam)
+	rawTx, err := tm.CreateSmartContractTransaction(testApp, walletID, accountID, "0.0002", "", &contract, callParam, "", 0)
 	if err != nil {
 		t.Errorf("CreateSmartContractTransaction failed, unexpected error: %v", err)
 		return
@@ -91,6 +94,56 @@ func TestSmartContractTransaction(t *testing.T) {
 		return
 	}
 	rawTx.AwaitResult = true
+	rawTx.AwaitTimeout = 10
+	tx, err := tm.SubmitSmartContractTransaction(testApp, rawTx.Account.WalletID, rawTx.Account.AccountID, rawTx)
+	if err != nil {
+		t.Errorf("SubmitSmartContractTransaction failed, unexpected error: %v", err)
+		return
+	}
+
+	log.Std.Info("tx: %+v", tx)
+	log.Info("wxID:", tx.WxID)
+	log.Info("txID:", rawTx.TxID)
+
+	for i, event := range tx.Events {
+		log.Std.Notice("data.Events[%d]: %+v", i, event)
+	}
+}
+
+func TestSmartContractTransaction_RAW(t *testing.T) {
+	tm := testInitWalletManager()
+	walletID := "WJyrmJL67qb6LsxtkaEkBrZoVtg83Ecj1y"
+	accountID := "Ff7w6KZZ9UWuVgVwVkvA9aegGxVTdKNr5jC2LDv142gs"
+
+	contract := openwallet.SmartContract{
+		Address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+		Symbol:  "TESTETH",
+	}
+
+	value := common.StringNumToBigIntWithExp("0.0002", 18)
+
+	raw := &quorum.CallMsg{
+		From:  "0xae3603dc4b216f91fadb82f7bd760e7ea08466be",
+		To:    "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+		Data:  "0x7ff36ab500000000000000000000000000000000000000000000000224d3fda1599df2b20000000000000000000000000000000000000000000000000000000000000080000000000000000000000000ae3603dc4b216f91fadb82f7bd760e7ea08466be000000000000000000000000000000000000000000000000000000005f4ceb700000000000000000000000000000000000000000000000000000000000000002000000000000000000000000c778417e063141139fce010982780140aa0cd5ab000000000000000000000000471483d78a0940bcfd38efb4a8cc017e285bd417",
+		Value: hexutil.EncodeBig(value),
+	}
+
+	rawJSON, _ := json.Marshal(raw)
+
+	rawTx, err := tm.CreateSmartContractTransaction(testApp, walletID, accountID, "0.0002", "", &contract, nil, string(rawJSON), 1)
+	if err != nil {
+		t.Errorf("CreateSmartContractTransaction failed, unexpected error: %v", err)
+		return
+	}
+	//log.Infof("rawTx: %+v", rawTx)
+
+	_, err = tm.SignSmartContractTransaction(testApp, walletID, accountID, "12345678", rawTx)
+	if err != nil {
+		t.Errorf("SignSmartContractTransaction failed, unexpected error: %v", err)
+		return
+	}
+	rawTx.AwaitResult = false
 	rawTx.AwaitTimeout = 10
 	tx, err := tm.SubmitSmartContractTransaction(testApp, rawTx.Account.WalletID, rawTx.Account.AccountID, rawTx)
 	if err != nil {
