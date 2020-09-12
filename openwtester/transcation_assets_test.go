@@ -135,7 +135,7 @@ func TestTransfer_TESTETH(t *testing.T) {
 	//}
 
 	for _, to := range addrs {
-		rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "1.5", "", nil, nil)
+		rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.0001", "", nil, nil)
 		if err != nil {
 			return
 		}
@@ -163,18 +163,18 @@ func TestTransfer_ERC20(t *testing.T) {
 
 	addrs := []string{
 		"0x1d47898162fdb807c3143078658788bc468af394",
-		"0x6c3e80ec7fb07a79bf610311bd5a72f7955e41cd",
-		"0x80e7ed8adba18afb5d434961db5bbb9c6ca097f6",
-		"0x81f66231abe6047ba70f1c8efb001d6ae31b75eb",
-		"0x932eb86cad71e02af5df3873f5c6f4c57e9a6eeb",
-		"0x938db33857b30b0878d1593d51961468c1ac4d6f",
-		"0x9501d338e3aeda069ef1adb769d5f8eab4d19c28",
-		"0x982c2d7eb62e121f253437dd9eab4441f3498565",
-		"0xb99b2e29ad98f8547114abc09ff53f03cd939ad5",
-		"0xdbbaeb5d88edbdb20e6c95904fb5ffa731373c3c",
-		"0xf43d89450ae388169b8b29ce2991a07f6d747eb8",
-		"0xf650fed6738b573bccdd47360cb03621bba15684",
-		"0xf75f4e7fa0ac8e774276d52428c5892a531af62a",
+		//"0x6c3e80ec7fb07a79bf610311bd5a72f7955e41cd",
+		//"0x80e7ed8adba18afb5d434961db5bbb9c6ca097f6",
+		//"0x81f66231abe6047ba70f1c8efb001d6ae31b75eb",
+		//"0x932eb86cad71e02af5df3873f5c6f4c57e9a6eeb",
+		//"0x938db33857b30b0878d1593d51961468c1ac4d6f",
+		//"0x9501d338e3aeda069ef1adb769d5f8eab4d19c28",
+		//"0x982c2d7eb62e121f253437dd9eab4441f3498565",
+		//"0xb99b2e29ad98f8547114abc09ff53f03cd939ad5",
+		//"0xdbbaeb5d88edbdb20e6c95904fb5ffa731373c3c",
+		//"0xf43d89450ae388169b8b29ce2991a07f6d747eb8",
+		//"0xf650fed6738b573bccdd47360cb03621bba15684",
+		//"0xf75f4e7fa0ac8e774276d52428c5892a531af62a",
 
 		//"0xd35f9ea14d063af9b3567064fab567275b09f03d",
 	}
